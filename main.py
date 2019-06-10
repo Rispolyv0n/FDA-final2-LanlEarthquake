@@ -36,7 +36,7 @@ test_file_names = [f for f in listdir(test_file_path) if isfile(join(test_file_p
 submission_data_path = './data/sample_submission.csv'
 
 n_rows = 150000
-read_data_row = n_rows * 1000
+read_data_row = n_rows * 4000
 skip_data_row = 0
 
 
@@ -46,9 +46,8 @@ logging.info('Reading training data(incomplete).')
 
 train_df = pd.read_csv(train_data_path, nrows=read_data_row, skiprows=skip_data_row)
 print(train_df.shape)
-
 # print(train_df.head(5))
-print('==========')
+# print('==========')
 # print(train_df.tail(5))
 logging.info('Reading training data done(incomplete).')
 
@@ -56,12 +55,12 @@ logging.info('Reading training data done(incomplete).')
 
 logging.info('Reading testing data(incomplete).')
 test_df_list = []
-read_num = 50
+read_num = 1
 cur_num = 0
 for name in test_file_names:
     test_df_list.append( pd.read_csv(test_file_path + '/' + name) )
     cur_num += 1
-    if(cur_num > read_num):
+    if(cur_num >= read_num):
         break
 print(len(test_df_list))
 logging.info('Reading testing data done(incomplete).')
@@ -125,5 +124,6 @@ predict_y = m_stacking.run(x_train = train_x, y_train = train_y, x_test = train_
 print(predict_y)
 print(predict_y.shape)
 print(mean_absolute_error(train_y, predict_y))
+
 
 
