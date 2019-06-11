@@ -32,7 +32,7 @@ pd.set_option('display.float_format', '{:20,.60f}'.format)
 pd.set_option('display.max_colwidth', -1)
 
 n_rows = 150000
-n_data = 4000
+n_data = 5
 read_data_row = n_rows * n_data
 skip_data_row = 0
 
@@ -137,14 +137,18 @@ logging.info('Plot feature importance...')
 feat_importance_list = m_stacking.get_feature_importance()
 feat_names = list(train_x.columns)
 
-for impor in feat_importance_list:
+
+for i,impor in enumerate(feat_importance_list):
     imp = impor
     imp,names = zip(*sorted(zip(imp,feat_names)))
     plt.barh(range(len(names)), imp, align='center')
     plt.yticks(range(len(names)), names)
     print('=================')
     print(names)
-    plt.show()
+    fig = plt.gcf()
+    fig.set_size_inches(36.5, 44.5)
+    # plt.show()
+    fig.savefig('featImp_'+str(i)+'.png')
 
 # grid search - model arguments
 
