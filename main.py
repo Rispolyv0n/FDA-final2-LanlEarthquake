@@ -16,6 +16,8 @@ import sys
 import feature_extraction as FE
 from model import stacking as ST
 
+from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.linear_model import Ridge, Lasso, LassoLars, ElasticNet
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.ensemble import AdaBoostRegressor
@@ -23,6 +25,8 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.svm import SVR
 from sklearn.metrics import mean_absolute_error
 import xgboost as xgb
+
+
 
 
 # Initialization
@@ -36,7 +40,7 @@ pd.set_option('display.float_format', '{:20,.60f}'.format)
 pd.set_option('display.max_colwidth', -1)
 
 n_rows = 150000
-n_data = 50
+n_data = 4190 # 4190
 read_data_row = n_rows * n_data
 skip_data_row = 0
 
@@ -49,10 +53,12 @@ feature_file_path_train = './data/features-'+str(n_data)+'.csv'
 feature_file_path_test = './data/features-test.csv'
 
 plot_feature_imp_file_path = './plot/featImp-'
-plot_model_corr_file_path = './plot/modelCorr.png'
+plot_model_corr_test_file_path = './plot/modelCorr-test.png'
+plot_model_corr_train_file_path = './plot/modelCorr-train.png'
 
 plot_feature_importance = False
-read_feature_from_file = False
+plot_model_correlation = False
+read_feature_from_file = True
 
 
 # Read feature data or original data
@@ -68,18 +74,19 @@ if(read_feature_from_file):
     logging.info('Reading training feature data: %s.' % feature_file_path_train)
     feature_df = pd.read_csv(feature_file_path_train, sep='\t')
     feature_df.drop(['Unnamed: 0'], axis=1, inplace=True) # drop 'Unnamed index'
+    # TODO - feature filtering
     print(feature_df.shape)
 
     logging.info('Reading testing feature data: %s.' % feature_file_path_test)
-    test_df = pd.read_csv(feature_file_path_test, sep='\t')
-    fest_df.drop(['Unnamed: 0'], axis=1, inplace=True) # drop 'Unnamed index'
-    print(test_df.shape)
+    test_x = pd.read_csv(feature_file_path_test, sep='\t')
+    test_x.drop(['Unnamed: 0'], axis=1, inplace=True) # drop 'Unnamed index'
+    # TODO - feature filtering
+    print(test_x.shape)
 
 else:
     # Read data - training data
 
     logging.info('Reading training data(incomplete).')
-
     train_df = pd.read_csv(train_data_path, nrows=read_data_row, skiprows=skip_data_row)
     print(train_df.shape)
 
@@ -87,13 +94,13 @@ else:
 
     logging.info('Reading testing data(incomplete).')
     test_df_list = []
-    read_num = 5
-    cur_num = 0
+    # read_num = 5
+    # cur_num = 0
     for name in test_file_names:
         test_df_list.append( pd.read_csv(test_file_path + '/' + name) )
-        cur_num += 1
-        if(cur_num >= read_num):
-            break
+        # cur_num += 1
+        # if(cur_num >= read_num):
+            # break
     print(len(test_df_list))
 
     # Read data - submission data
@@ -146,6 +153,13 @@ else:
 
 # Initialize models
 
+clf_line = LinearRegression()
+clf_ridg = Ridge()
+clf_laso = Lasso()
+clf_lala = LassoLars()
+clf_enet = ElasticNet()
+clf_bxgb = xgb.XGBRegressor()
+
 clf_rf = RandomForestRegressor()
 clf_tree = ExtraTreesRegressor()
 clf_ada = AdaBoostRegressor()
@@ -154,13 +168,17 @@ clf_svr = SVR()
 
 base_model_name = ['RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
 base_model_list = [clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
+
+# base_model_name = ['LinearReg', 'Ridge', 'Lasso', 'LassoLars', 'ElasticNet', 'Xgb', 'RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
+# base_model_list = [clf_line, clf_ridg, clf_laso, clf_lala, clf_enet, clf_bxgb, clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
+
 clf_xgb = xgb.XGBRegressor()
 
 m_stacking = ST.StackModel(baseModelList = base_model_list, clfModel = clf_xgb)
-predict_y = m_stacking.run(x_train = feature_df.drop(['time_to_failure'], axis=1), y_train = feature_df['time_to_failure'], x_test = feature_df.drop(['time_to_failure'], axis=1) ) # x_test = test_x
+predict_y = m_stacking.run(x_train = feature_df.drop(['time_to_failure'], axis=1), y_train = feature_df['time_to_failure'], x_test = test_x ) # x_test = test_x
 print(predict_y)
 print(predict_y.shape)
-print(mean_absolute_error(feature_df['time_to_failure'], predict_y))
+# print(mean_absolute_error(feature_df['time_to_failure'], predict_y))
 
 
 # Plot feature importance
@@ -183,22 +201,41 @@ if(plot_feature_importance):
         fig.savefig(plot_feature_imp_file_path + base_model_name[i] + '.png')
 
 
-# Plot model correlation
+if(plot_model_correlation):
+    # Plot model correlation - test
 
-logging.info('Plot model correlation...')
-base_prediction = m_stacking.get_base_prediction()
-print(base_prediction.shape)
+    logging.info('Plot model correlation - test...')
+    base_prediction = m_stacking.get_base_prediction()
+    print(base_prediction.shape)
 
-base_prediction.columns = base_model_name
-corr = base_prediction.corr()
+    base_prediction.columns = base_model_name
+    corr = base_prediction.corr()
 
-sns.set()
-cmap = sns.diverging_palette(220, 10, as_cmap=True)
-fig, heatmap_ax = plt.subplots(figsize=(10,10))
+    sns.set()
+    cmap = sns.diverging_palette(220, 10, as_cmap=True)
+    fig, heatmap_ax = plt.subplots(figsize=(10,10))
 
-sns.heatmap(corr, cmap=cmap, vmax=1, center=0, square=True, linewidths=0, annot=True, ax=heatmap_ax)
-# plt.show()
-plt.savefig(plot_model_corr_file_path)
+    sns.heatmap(corr, cmap=cmap, vmax=1, center=0, square=True, linewidths=0, annot=True, ax=heatmap_ax)
+    # plt.show()
+    plt.savefig(plot_model_corr_test_file_path)
+
+
+    # Plot model correlation - train
+
+    logging.info('Plot model correlation - train...')
+    base_out = m_stacking.get_base_out_train()
+    print(base_out.shape)
+
+    base_out.columns = base_model_name
+    corr = base_out.corr()
+
+    sns.set()
+    cmap = sns.diverging_palette(220, 10, as_cmap=True)
+    fig, heatmap_ax = plt.subplots(figsize=(10,10))
+
+    sns.heatmap(corr, cmap=cmap, vmax=1, center=0, square=True, linewidths=0, annot=True, ax=heatmap_ax)
+    # plt.show()
+    plt.savefig(plot_model_corr_train_file_path)
 
 
 # grid search - model arguments

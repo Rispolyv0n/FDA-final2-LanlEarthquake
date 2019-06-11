@@ -13,7 +13,9 @@ class StackModel():
         self.clfModel = clfModel
         self.n_fold = len(baseModelList)
 
-    def run(self, x_train, y_train, x_test):
+    def run(self, x_train, y_train, x_test, get_feat_imp=False):
+        self.get_feat_imp = get_feat_imp
+
         # --- level 1 ---
         # kfold
         logging.info('In stacking model - Training base models...')
@@ -29,7 +31,7 @@ class StackModel():
         base_model_out_test_list = [ pd.DataFrame(index=range(x_test.shape[0]), dtype=np.float64, columns=range(self.n_fold)) for x in range(self.n_fold) ]
 
         for i, (train_index, test_index) in enumerate(kf.split(x_train)):
-            logging.info('In stacking model - In K-Fold %d.' % i)
+            logging.info('In stacking model - In K-Fold %d.' % i+1)
             # print("TRAIN:", train_index, "TEST:", test_index)
 
             oof_train_x, oof_test_x = x_train.iloc[train_index], x_train.iloc[test_index]
@@ -48,6 +50,9 @@ class StackModel():
         logging.info('In stacking model - Finish training base models.')
         print(base_model_out_train.shape)
         print(base_model_out_train.head())
+        self.base_out_train = base_model_out_train
+
+        # calculate mean prediction of each model
         base_model_out_mean = pd.DataFrame(index=range(x_test.shape[0]), dtype=np.float64, columns=range(self.n_fold))
         for i, df in enumerate(base_model_out_test_list):
             base_model_out_mean.iloc[:, i] = df.mean(axis=1)
@@ -63,7 +68,7 @@ class StackModel():
         print(base_model_out_train.head())
         self.clfModel.fit(base_model_out_train, y_train.values.ravel())
 
-        # to be deleted!
+        # check single model performance (predict training data & calculate loss)
         final_out_train = self.clfModel.predict(base_model_out_train)
         print(final_out_train.shape)
         print(mean_absolute_error(y_train, final_out_train))
@@ -74,18 +79,26 @@ class StackModel():
         print(base_model_out_mean.head())
 
         # calculate feature importance
-        logging.info('In stacking model - Calculating feature importance...')
-        self.feature_importance = []
-        for model in self.baseModelList:
-            if(not isinstance(model, SVR)):
-                self.feature_importance.append(model.feature_importances_)
+        if(self.get_feat_imp):
+            logging.info('In stacking model - Calculating feature importance...')
+            self.feature_importance = []
+            for model in self.baseModelList:
+                if(not isinstance(model, SVR)):
+                    self.feature_importance.append(model.feature_importances_)
 
-        logging.info('In stacking model - Finish.')        
+        logging.info('In stacking model - Finish training.')        
         return test_final_out
 
     def get_feature_importance(self):
-        return self.feature_importance
+        if(self.get_feat_imp):
+            return self.feature_importance
+        else:
+            logging.info('In stacking model - No available feature importance.')
+            return []
 
     def get_base_prediction(self):
         return self.base_out_prediction
+
+    def get_base_out_train(self):
+        return self.base_out_train
         
