@@ -34,7 +34,7 @@ pd.set_option('display.float_format', '{:20,.60f}'.format)
 pd.set_option('display.max_colwidth', -1)
 
 n_rows = 150000
-n_data = 50
+n_data = 4000
 read_data_row = n_rows * n_data
 skip_data_row = 0
 
