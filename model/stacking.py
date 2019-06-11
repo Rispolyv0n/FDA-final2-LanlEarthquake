@@ -1,5 +1,6 @@
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_absolute_error
+from sklearn.svm import SVR
 import pandas as pd
 import numpy as np
 
@@ -61,15 +62,26 @@ class StackModel():
         print(base_model_out_train.head())
         self.clfModel.fit(base_model_out_train, y_train.values.ravel())
 
+        # to be deleted!
         final_out_train = self.clfModel.predict(base_model_out_train)
         print(final_out_train.shape)
         print(mean_absolute_error(y_train, final_out_train))
         
+        # predict
         test_final_out = self.clfModel.predict(base_model_out_mean)
         print(base_model_out_mean.shape)
         print(base_model_out_mean.head())
 
-        logging.info('In stacking model - Finish.')
+        # calculate feature importance
+        logging.info('In stacking model - Calculating feature importance...')
+        self.feature_importance = []
+        for model in self.baseModelList:
+            if(not isinstance(model, SVR)):
+                self.feature_importance.append(model.feature_importances_)
+
+        logging.info('In stacking model - Finish.')        
         return test_final_out
 
+    def get_feature_importance(self):
+        return self.feature_importance
         

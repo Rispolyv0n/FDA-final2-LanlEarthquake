@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 from os import listdir
 from os.path import isfile, join
@@ -30,14 +31,16 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.float_format', '{:20,.60f}'.format)
 pd.set_option('display.max_colwidth', -1)
 
+n_rows = 150000
+n_data = 4000
+read_data_row = n_rows * n_data
+skip_data_row = 0
+
 train_data_path = './data/train.csv'
 test_file_path = './data/test'
 test_file_names = [f for f in listdir(test_file_path) if isfile(join(test_file_path, f))]
 submission_data_path = './data/sample_submission.csv'
-
-n_rows = 150000
-read_data_row = n_rows * 4000
-skip_data_row = 0
+feature_file_path = './data/features-'+str(n_data)+'.csv'
 
 
 # Read data - training data
@@ -74,7 +77,6 @@ submission_df = pd.read_csv(submission_data_path)
 
 logging.info('Extracting features(training data)...')
 segments = int(np.floor(train_df.shape[0] / n_rows))
-# print(segments)
 train_x = pd.DataFrame(index=range(segments), dtype=np.float64)
 train_y = pd.DataFrame(index=range(segments), dtype=np.float64, columns=['time_to_failure'])
 
@@ -83,8 +85,12 @@ for seg_id in tqdm(range(segments)):
     FE.create_features(seg_id, seg, train_x)
     train_y.loc[seg_id, 'time_to_failure'] = seg['time_to_failure'].values[-1]
 
+# write to csv file
+logging.info('Writing features to csv...')
+train_x.to_csv(feature_file_path, sep='\t', encoding='utf-8')
+
 # check !
-logging.info('Checking features:')
+logging.info('Checking features of training data:')
 # print(train_x.head())
 print(train_x.shape)
 # print(train_y.head())
@@ -95,7 +101,6 @@ print(train_y.shape)
 
 logging.info('Extracting features(testing data)...')
 segments = len(test_df_list)
-# print(segments)
 test_x = pd.DataFrame(index=range(segments), dtype=np.float64)
 
 for seg_id in tqdm(range(segments)):
@@ -103,7 +108,7 @@ for seg_id in tqdm(range(segments)):
     FE.create_features(seg_id, seg, test_x)
 
 # check !
-logging.info('Checking features:')
+logging.info('Checking features of testing data:')
 # print(test_x.head())
 print(test_x.shape)
 
@@ -126,4 +131,20 @@ print(predict_y.shape)
 print(mean_absolute_error(train_y, predict_y))
 
 
+# plot feature importance
+
+logging.info('Plot feature importance...')
+feat_importance_list = m_stacking.get_feature_importance()
+feat_names = list(train_x.columns)
+
+for impor in feat_importance_list:
+    imp = impor
+    imp,names = zip(*sorted(zip(imp,feat_names)))
+    plt.barh(range(len(names)), imp, align='center')
+    plt.yticks(range(len(names)), names)
+    print('=================')
+    print(names)
+    plt.show()
+
+# grid search - model arguments
 
