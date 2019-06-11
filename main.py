@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-import matplotlib
-matplotlib.use('Agg')
+
+# import matplotlib
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 from os import listdir
 from os.path import isfile, join
@@ -34,7 +36,7 @@ pd.set_option('display.float_format', '{:20,.60f}'.format)
 pd.set_option('display.max_colwidth', -1)
 
 n_rows = 150000
-n_data = 4190
+n_data = 50
 read_data_row = n_rows * n_data
 skip_data_row = 0
 
@@ -42,11 +44,18 @@ train_data_path = './data/train.csv'
 test_file_path = './data/test'
 test_file_names = [f for f in listdir(test_file_path) if isfile(join(test_file_path, f))]
 submission_data_path = './data/sample_submission.csv'
+
 feature_file_path_train = './data/features-'+str(n_data)+'.csv'
 feature_file_path_test = './data/features-test.csv'
 
-plot_feature_importance = True
+plot_feature_imp_file_path = './plot/featImp-'
+plot_model_corr_file_path = './plot/modelCorr.png'
+
+plot_feature_importance = False
 read_feature_from_file = False
+
+
+# Read feature data or original data
 
 if(read_feature_from_file):
     if(not isfile(feature_file_path_train)):
@@ -73,21 +82,18 @@ else:
 
     train_df = pd.read_csv(train_data_path, nrows=read_data_row, skiprows=skip_data_row)
     print(train_df.shape)
-    # print(train_df.head(5))
-    # print('==========')
-    # print(train_df.tail(5))
 
     # Read data - testing data
 
     logging.info('Reading testing data(incomplete).')
     test_df_list = []
-    # read_num = 5
-    # cur_num = 0
+    read_num = 5
+    cur_num = 0
     for name in test_file_names:
         test_df_list.append( pd.read_csv(test_file_path + '/' + name) )
-        # cur_num += 1
-        # if(cur_num >= read_num):
-        #     break
+        cur_num += 1
+        if(cur_num >= read_num):
+            break
     print(len(test_df_list))
 
     # Read data - submission data
@@ -112,11 +118,9 @@ else:
     feature_df = pd.concat([train_x, train_y], axis=1)
     feature_df.to_csv(feature_file_path_train, sep='\t', encoding='utf-8')
 
-    # check !
+    # check
     logging.info('Checking features of training data:')
-    # print(train_x.head())
     print(train_x.shape)
-    # print(train_y.head())
     print(train_y.shape)
 
 
@@ -134,9 +138,8 @@ else:
     logging.info('Writing features to csv(testing data)...')
     test_x.to_csv(feature_file_path_test, sep='\t', encoding='utf-8')
 
-    # check !
+    # check
     logging.info('Checking features of testing data:')
-    # print(test_x.head())
     print(test_x.shape)
 
 
@@ -149,18 +152,18 @@ clf_ada = AdaBoostRegressor()
 clf_grad = GradientBoostingRegressor()
 clf_svr = SVR()
 
+base_model_name = ['RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
 base_model_list = [clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
 clf_xgb = xgb.XGBRegressor()
 
 m_stacking = ST.StackModel(baseModelList = base_model_list, clfModel = clf_xgb)
-# predict_y = m_stacking.run(x_train = train_x, y_train = train_y, x_test = train_x) # x_test = test_x
 predict_y = m_stacking.run(x_train = feature_df.drop(['time_to_failure'], axis=1), y_train = feature_df['time_to_failure'], x_test = feature_df.drop(['time_to_failure'], axis=1) ) # x_test = test_x
 print(predict_y)
 print(predict_y.shape)
 print(mean_absolute_error(feature_df['time_to_failure'], predict_y))
 
 
-# plot feature importance
+# Plot feature importance
 
 if(plot_feature_importance):
     logging.info('Plot feature importance...')
@@ -177,7 +180,26 @@ if(plot_feature_importance):
         fig = plt.gcf()
         fig.set_size_inches(36.5, 44.5)
         # plt.show()
-        fig.savefig('./plot/featImp_'+str(i)+'.png')
+        fig.savefig(plot_feature_imp_file_path + base_model_name[i] + '.png')
+
+
+# Plot model correlation
+
+logging.info('Plot model correlation...')
+base_prediction = m_stacking.get_base_prediction()
+print(base_prediction.shape)
+
+base_prediction.columns = base_model_name
+corr = base_prediction.corr()
+
+sns.set()
+cmap = sns.diverging_palette(220, 10, as_cmap=True)
+fig, heatmap_ax = plt.subplots(figsize=(10,10))
+
+sns.heatmap(corr, cmap=cmap, vmax=1, center=0, square=True, linewidths=0, annot=True, ax=heatmap_ax)
+# plt.show()
+plt.savefig(plot_model_corr_file_path)
+
 
 # grid search - model arguments
 

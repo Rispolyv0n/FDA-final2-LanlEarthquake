@@ -30,7 +30,7 @@ class StackModel():
 
         for i, (train_index, test_index) in enumerate(kf.split(x_train)):
             logging.info('In stacking model - In K-Fold %d.' % i)
-            print("TRAIN:", train_index, "TEST:", test_index)
+            # print("TRAIN:", train_index, "TEST:", test_index)
 
             oof_train_x, oof_test_x = x_train.iloc[train_index], x_train.iloc[test_index]
             oof_train_y, oof_test_y = y_train.iloc[train_index], y_train.iloc[test_index]
@@ -54,6 +54,7 @@ class StackModel():
         print(base_model_out_mean.shape)
         print(base_model_out_mean.head())
         # print(base_model_out_mean.head(x_test.shape[0]))
+        self.base_out_prediction = base_model_out_mean
 
         # --- level 2 ---
         # train
@@ -84,4 +85,7 @@ class StackModel():
 
     def get_feature_importance(self):
         return self.feature_importance
+
+    def get_base_prediction(self):
+        return self.base_out_prediction
         
