@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
-# import matplotlib
-# matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -61,7 +61,7 @@ plot_model_corr_train_file_path = './plot/modelCorr-train.png'
 plot_feature_importance = False
 plot_model_correlation = True
 read_feature_from_file = True
-remove_bad_feature = True
+remove_bad_feature = False
 
 
 
