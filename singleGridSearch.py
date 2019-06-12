@@ -189,18 +189,18 @@ param_xgrf = {
 # print(gs_ridg.best_params_)
 # print(gs_ridg.best_score_)
 
-# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', feature_df)
+# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df)
 
-grid_search_for_models(model=clf_laso, param=param_laso, name='Lasso', feature_df)
-grid_search_for_models(model=clf_lala, param=param_lala, name='LassoLars', feature_df)
-grid_search_for_models(model=clf_enet, param=param_enet, name='ElasticNet', feature_df)
-grid_search_for_models(model=clf_xgbr, param=param_xgbr, name='XGB Regression', feature_df)
-grid_search_for_models(model=clf_xgrf, param=param_xgrf, name='XGB RF', feature_df)
+grid_search_for_models(model=clf_laso, param=param_laso, name='Lasso', data=feature_df)
+grid_search_for_models(model=clf_lala, param=param_lala, name='LassoLars', data=feature_df)
+grid_search_for_models(model=clf_enet, param=param_enet, name='ElasticNet', data=feature_df)
+grid_search_for_models(model=clf_xgbr, param=param_xgbr, name='XGB Regression', data=feature_df)
+grid_search_for_models(model=clf_xgrf, param=param_xgrf, name='XGB RF', data=feature_df)
 
-# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', feature_df)
-# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', feature_df)
-# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', feature_df)
-# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', feature_df)
+# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df)
+# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df)
+# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df)
+# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df)
 
 
 
