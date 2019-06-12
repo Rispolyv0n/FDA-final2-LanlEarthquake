@@ -31,10 +31,9 @@ def grid_search_for_models(model, param, name, data):
                         scoring='neg_mean_absolute_error',
                         cv=5)
     gs.fit(data.drop(['time_to_failure'], axis=1), data['time_to_failure'])
-
-    logging.info('=====================================')
     print(gs.best_params_)
     print(gs.best_score_)
+    logging.info('=====================================')
     return
 
 
@@ -127,8 +126,8 @@ clf_enet = ElasticNet(max_iter=5000)
 clf_xgbr = xgb.XGBRegressor()
 clf_xgrf = xgb.XGBRFRegressor()
 
-clf_rf = RandomForestRegressor()
-clf_tree = ExtraTreesRegressor()
+clf_rf = RandomForestRegressor(criterion='mae')
+clf_tree = ExtraTreesRegressor(criterion='mae')
 clf_ada = AdaBoostRegressor()
 clf_grad = GradientBoostingRegressor()
 clf_svr = SVR()
@@ -136,71 +135,101 @@ clf_svr = SVR()
 # base_model_name = ['Ridge', 'Lasso', 'LassoLars', 'ElasticNet', 'XgbReg', 'XgbRf', 'RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
 # base_model_list = [clf_ridg, clf_laso, clf_lala, clf_enet, clf_xgbr, clf_xgrf, clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
 
+# mae 2.160
 param_ridg = {
-    'alpha': [1, 10, 30, 100, 300, 1000],
-    'tol': [0.00001, 0.0000001, 0.000000001, 0.00000000001],
-    'solver': ['svd', 'cholesky', 'lsqr', 'sparse_cg', 'sag', 'saga'],
+    'alpha': [1, 10, 30, 100, 300, 1000], # 300
+    'tol': [0.00001, 0.0000001, 0.000000001, 0.00000000001], # 1e-5
+    'solver': ['svd', 'cholesky', 'lsqr', 'sparse_cg', 'sag', 'saga'], # sparse_cg
 }
 
+# mae 2.169
 param_laso = {
-    'alpha': [1, 10, 100, 1000],
-    'tol': [0.00001, 0.0000001, 0.000000001],
+    'alpha': [1, 0.1, 0.001, 0.0001, 10, 100, 1000], # 0.1
+    'tol': [0.001, 0.00001, 0.0000001, 0.000000001], # 1e-5
 }
 
+# mae 2.159
 param_lala = {
-    'alpha': [1, 10, 100, 1000],
-    'eps': [2.220446049250313e-16, 2.220446049250313e-10]
+    'alpha': [0.1, 0.001, 0.0001, 1, 10, 100, 1000], # 0.001
+    'eps': [2.220446049250313e-16, 2.220446049250313e-10] # e-16
 }
 
+# mae 2.174 {alpha 1 [1, 10, 100], tol 1e-5 [0.00001, 0.0000001, 0.000000001], l1_ratio 0 [0, 0.5, 1]}
+# mae 2.160 {alpha 0.1 [1, 0.1, 0.001], tol 0.001 [0.001, 0.00001], l1_ratio 0 [0, 1]}
+# mae *
 param_enet = {
-    'alpha': [1, 10, 100],
-    'tol': [0.00001, 0.0000001, 0.000000001],
-    'l1_ratio': [0, 0.5, 1],
+    'alpha': [1, 0.1, 0.001], # 0.1
+    'tol': [0.01, 0.001], # 0.001
+    'l1_ratio': [0, 0.2, 0.5] # 0
 }
+
 
 param_xgbr = {
-    'max_depth': [3, 8, 13, 20],
-    'learning_rate': [0.1, 0.01, 0.001],
+    'max_depth': [3, 8, 10],
+    'learning_rate': [0.1, 0.01],
     'n_estimators': [100, 200],
     'booster': ['gbtree', 'gblinear', 'dart'],
-    'gamma': [0, 0.000001, 0.0001],
+    'gamma': [0, 0.0001],
 }
 
+# mae 4.734
 param_xgrf = {
-    'max_depth': [3, 8, 13, 20],
-    'learning_rate': [0.1, 0.01, 0.001],
-    'n_estimators': [100, 200],
-    'booster': ['gbtree', 'gblinear', 'dart'],
-    'gamma': [0, 0.000001, 0.0001],
+    'max_depth': [3, 8, 13, 20], # 3
+    'learning_rate': [0.1, 0.01, 0.001], # 0.1
+    'n_estimators': [100, 200], # 200
+    'booster': ['gbtree', 'gblinear', 'dart'], # gbtree
+    'gamma': [0, 0.000001, 0.0001], # 0
 }
+
+param_rf = {
+    'n_estimators': [10, 30, 100],
+    'max_depth': [5, 10, None],
+    'max_features': [None, 'sqrt', 'log2']
+}
+
+param_tree = {
+    'n_estimators': [10, 30, 100],
+    'max_depth': [5, 10, None],
+    'max_features': [None, 'sqrt', 'log2']
+}
+
+param_ada = {
+    'n_estimators': [50, 100, 150, 200],
+    'loss': ['linear', 'exponential', 'square']
+}
+
+param_grad = {
+    'loss': ['ls', 'lad', 'huber', 'quantile'],
+    'n_estimators': [100, 300],
+    'criterion': ['mae', 'friedman_mse'],
+    'max_depth': [3, 10],
+    'max_features': [None, 'sqrt', 'log2']
+}
+
+param_svr = {
+    'kernel': ['rbf', 'linear', 'poly', 'sigmoid', 'precomputed'],
+    'C': [0.1, 1, 10, 100]
+}
+
 
 
 # grid search - model arguments
 
-# ridge
-# logging.info('Start grid searching...')
-# gs_ridg = GridSearchCV(estimator=clf_ridg,  
-#                      param_grid=param_ridg,
-#                      scoring='neg_mean_absolute_error',
-#                      cv=5)
-# gs_ridg.fit(feature_df.drop(['time_to_failure'], axis=1), feature_df['time_to_failure'])
 
-# logging.info('Finish grid searching.')
-# print(gs_ridg.best_params_)
-# print(gs_ridg.best_score_)
+# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df) # done
+# grid_search_for_models(model=clf_laso, param=param_laso, name='Lasso', data=feature_df) # done
+# grid_search_for_models(model=clf_lala, param=param_lala, name='LassoLars', data=feature_df) # done
 
-# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df)
-
-grid_search_for_models(model=clf_laso, param=param_laso, name='Lasso', data=feature_df)
-grid_search_for_models(model=clf_lala, param=param_lala, name='LassoLars', data=feature_df)
 grid_search_for_models(model=clf_enet, param=param_enet, name='ElasticNet', data=feature_df)
-grid_search_for_models(model=clf_xgbr, param=param_xgbr, name='XGB Regression', data=feature_df)
-grid_search_for_models(model=clf_xgrf, param=param_xgrf, name='XGB RF', data=feature_df)
 
-# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df)
-# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df)
-# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df)
-# grid_search_for_models(model=clf_ridg, param=param_ridg, name='Ridge', data=feature_df)
+# grid_search_for_models(model=clf_xgbr, param=param_xgbr, name='XGB Regression', data=feature_df) #
+# grid_search_for_models(model=clf_xgrf, param=param_xgrf, name='XGB RF', data=feature_df) # done
+
+# grid_search_for_models(model=clf_rf, param=param_rf, name='RandomForest', data=feature_df) # 
+# grid_search_for_models(model=clf_tree, param=param_tree, name='ExtraTrees', data=feature_df) #
+# grid_search_for_models(model=clf_ada, param=param_ada, name='AdaBoost', data=feature_df) #
+# grid_search_for_models(model=clf_grad, param=param_grad, name='GradientBoost', data=feature_df) #
+# grid_search_for_models(model=clf_svr, param=param_svr, name='SVR', data=feature_df) #
 
 
 
