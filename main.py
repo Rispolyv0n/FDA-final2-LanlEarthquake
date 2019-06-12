@@ -16,6 +16,7 @@ import sys
 import feature_extraction as FE
 from model import stacking as ST
 
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.linear_model import Ridge, Lasso, LassoLars, ElasticNet
 from sklearn.ensemble import RandomForestRegressor
@@ -56,7 +57,7 @@ plot_feature_imp_file_path = './plot/featImp-'
 plot_model_corr_test_file_path = './plot/modelCorr-test.png'
 plot_model_corr_train_file_path = './plot/modelCorr-train.png'
 
-plot_feature_importance = False
+plot_feature_importance = True
 plot_model_correlation = False
 read_feature_from_file = True
 
@@ -151,6 +152,20 @@ else:
 
 
 
+# Feature scaling
+
+logging.info('Scaling features...')
+
+column_name_list = list(feature_df.columns)
+print(len(column_name_list))
+column_name_list.remove('time_to_failure')
+print(len(column_name_list))
+
+feature_scaler = StandardScaler()
+feature_df[column_name_list] = feature_scaler.fit_transform(feature_df[column_name_list])
+test_x = feature_scaler.transform(test_x)
+
+
 # Initialize models
 
 clf_line = LinearRegression()
@@ -175,10 +190,11 @@ base_model_list = [clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
 clf_xgb = xgb.XGBRegressor()
 
 m_stacking = ST.StackModel(baseModelList = base_model_list, clfModel = clf_xgb)
-predict_y = m_stacking.run(x_train = feature_df.drop(['time_to_failure'], axis=1), y_train = feature_df['time_to_failure'], x_test = test_x ) # x_test = test_x
+predict_y = m_stacking.run(x_train = feature_df.drop(['time_to_failure'], axis=1), y_train = feature_df['time_to_failure'], x_test = feature_df.drop(['time_to_failure'], axis=1), get_feat_imp=plot_feature_importance ) # x_test = test_x
+logging.info('Finish Training.')
 print(predict_y)
 print(predict_y.shape)
-# print(mean_absolute_error(feature_df['time_to_failure'], predict_y))
+print(mean_absolute_error(feature_df['time_to_failure'], predict_y)) # prediction mae
 
 
 # Plot feature importance
@@ -186,11 +202,12 @@ print(predict_y.shape)
 if(plot_feature_importance):
     logging.info('Plot feature importance...')
     feat_importance_list = m_stacking.get_feature_importance()
-    feat_names = list(train_x.columns)
+    feat_names = column_name_list
 
     for i,impor in enumerate(feat_importance_list):
         imp = impor
         imp,names = zip(*sorted(zip(imp,feat_names)))
+        plt.figure(i)
         plt.barh(range(len(names)), imp, align='center')
         plt.yticks(range(len(names)), names)
         print('=================')

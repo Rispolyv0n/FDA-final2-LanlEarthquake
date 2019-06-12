@@ -31,7 +31,7 @@ class StackModel():
         base_model_out_test_list = [ pd.DataFrame(index=range(x_test.shape[0]), dtype=np.float64, columns=range(self.n_fold)) for x in range(self.n_fold) ]
 
         for i, (train_index, test_index) in enumerate(kf.split(x_train)):
-            logging.info('In stacking model - In K-Fold %d.' % i+1)
+            logging.info('In stacking model - In K-Fold %d.' % (i+1))
             # print("TRAIN:", train_index, "TEST:", test_index)
 
             oof_train_x, oof_test_x = x_train.iloc[train_index], x_train.iloc[test_index]
@@ -45,7 +45,7 @@ class StackModel():
                 model.fit(oof_train_x, oof_train_y.values.ravel())
                 base_model_out_train.iloc[test_index, j] = model.predict(oof_test_x)
                 base_model_out_test_list[j].iloc[:, i] = model.predict(x_test)
-                print(mean_absolute_error(oof_test_y, base_model_out_train.iloc[test_index, j])) # mae
+                print(mean_absolute_error(oof_test_y, base_model_out_train.iloc[test_index, j])) # oof mae
 
         logging.info('In stacking model - Finish training base models.')
         print(base_model_out_train.shape)
@@ -71,7 +71,7 @@ class StackModel():
         # check single model performance (predict training data & calculate loss)
         final_out_train = self.clfModel.predict(base_model_out_train)
         print(final_out_train.shape)
-        print(mean_absolute_error(y_train, final_out_train))
+        print(mean_absolute_error(y_train, final_out_train)) # training mae
         
         # predict
         test_final_out = self.clfModel.predict(base_model_out_mean)
