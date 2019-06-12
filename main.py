@@ -228,7 +228,7 @@ print(predict_y.shape)
 result_df = pd.DataFrame(index=range(predict_y.shape[0]), dtype=np.float64)
 result_df['seg_id'] = test_x['seg_id']
 result_df['time_to_failure'] = predict_y
-submission_file_name = './data/output/stacking_model_original5.csv'
+submission_file_name = './data/output/stacking_model_original5_filterFeat.csv'
 print(result_df.shape)
 result_df.to_csv(submission_file_name, sep=',', encoding='utf-8', index=False)
 
