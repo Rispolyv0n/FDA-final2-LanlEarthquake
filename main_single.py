@@ -2,9 +2,6 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 from os import listdir
 from os.path import isfile, join
 import datetime
