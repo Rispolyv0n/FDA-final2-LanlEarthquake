@@ -61,7 +61,7 @@ plot_model_corr_train_file_path = './plot/modelCorr-train.png'
 plot_feature_importance = False
 plot_model_correlation = True
 read_feature_from_file = True
-remove_bad_feature = True
+remove_bad_feature = False
 
 
 
