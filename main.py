@@ -59,7 +59,7 @@ plot_model_corr_test_file_path = './plot/modelCorr-test.png'
 plot_model_corr_train_file_path = './plot/modelCorr-train.png'
 
 plot_feature_importance = False
-plot_model_correlation = False
+plot_model_correlation = True
 read_feature_from_file = True
 remove_bad_feature = True
 
@@ -209,8 +209,11 @@ clf_ada = AdaBoostRegressor(n_estimators=3, loss='linear')
 clf_grad = GradientBoostingRegressor() # not yet
 clf_svr = SVR(kernel='rbf', C=0.1)
 
-base_model_name = ['RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
-base_model_list = [clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
+# base_model_name = ['RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
+# base_model_list = [clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
+
+base_model_name = ['LinearReg', 'XgbReg', 'XgbRf', 'RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
+base_model_list = [clf_line,  clf_xgbr, clf_xgrf, clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
 
 # base_model_name = ['LinearReg', 'Ridge', 'Lasso', 'LassoLars', 'ElasticNet', 'Xgb', 'RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
 # base_model_list = [clf_line, clf_ridg, clf_laso, clf_lala, clf_enet, clf_bxgb, clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
@@ -228,7 +231,7 @@ print(predict_y.shape)
 result_df = pd.DataFrame(index=range(predict_y.shape[0]), dtype=np.float64)
 result_df['seg_id'] = test_x['seg_id']
 result_df['time_to_failure'] = predict_y
-submission_file_name = './data/output/stacking_model_original5_filterFeat.csv'
+submission_file_name = './data/output/stacking_model_new8_filterFeat.csv'
 print(result_df.shape)
 result_df.to_csv(submission_file_name, sep=',', encoding='utf-8', index=False)
 
