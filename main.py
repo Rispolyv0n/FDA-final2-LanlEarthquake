@@ -195,25 +195,25 @@ test_x[test_column_name_list] = feature_scaler.transform(test_x[test_column_name
 # Initialize models
 
 clf_line = LinearRegression()
-# clf_ridg = Ridge(alpha=300, tol=1e-05, solver='sparse_cg', max_iter=5000)
-# clf_laso = Lasso(alpha=0.1, tol=1e-05, max_iter=5000)
-# clf_lala = LassoLars(alpha=0.001, max_iter=5000)
-# clf_enet = ElasticNet(alpha=0.1, tol=0.001, l1_ratio=0.2, max_iter=5000)
+clf_ridg = Ridge(alpha=300, tol=1e-05, solver='sparse_cg', max_iter=5000)
+clf_laso = Lasso(alpha=0.1, tol=1e-05, max_iter=5000)
+clf_lala = LassoLars(alpha=0.001, max_iter=5000)
+clf_enet = ElasticNet(alpha=0.1, tol=0.001, l1_ratio=0.2, max_iter=5000)
 
 clf_xgbr = xgb.XGBRegressor() # not yet
 clf_xgrf = xgb.XGBRFRegressor() # not yet
 
-clf_rf = RandomForestRegressor(criterion='mae', max_features='sqrt', n_estimators=200, max_depth=10)
+# clf_rf = RandomForestRegressor(criterion='mae', max_features='sqrt', n_estimators=200, max_depth=10)
 clf_tree = ExtraTreesRegressor(criterion='mae', max_features='sqrt', n_estimators=200, max_depth=10)
 clf_ada = AdaBoostRegressor(n_estimators=3, loss='linear')
-clf_grad = GradientBoostingRegressor() # not yet
+# clf_grad = GradientBoostingRegressor() # not yet
 clf_svr = SVR(kernel='rbf', C=0.1)
 
 # base_model_name = ['RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
 # base_model_list = [clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
 
-base_model_name = ['LinearReg', 'XgbReg', 'XgbRf', 'RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
-base_model_list = [clf_line,  clf_xgbr, clf_xgrf, clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
+base_model_name = ['LinearReg', 'Ridge', 'Lasso', 'LassoLars', 'ElasticNet', 'XgbReg', 'XgbRf', 'ExtraTree', 'AdaBoost', 'SVR']
+base_model_list = [clf_line, clf_ridg, clf_laso, clf_lala, clf_enet, clf_xgbr, clf_xgrf, clf_tree, clf_ada, clf_svr]
 
 # base_model_name = ['LinearReg', 'Ridge', 'Lasso', 'LassoLars', 'ElasticNet', 'Xgb', 'RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
 # base_model_list = [clf_line, clf_ridg, clf_laso, clf_lala, clf_enet, clf_bxgb, clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
