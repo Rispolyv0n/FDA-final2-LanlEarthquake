@@ -209,11 +209,17 @@ clf_ada = AdaBoostRegressor(n_estimators=3, loss='linear')
 # clf_grad = GradientBoostingRegressor() # not yet
 clf_svr = SVR(kernel='rbf', C=0.1)
 
+# ori 5
 # base_model_name = ['RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
 # base_model_list = [clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
 
-base_model_name = ['LinearReg', 'Ridge', 'Lasso', 'LassoLars', 'ElasticNet', 'XgbReg', 'XgbRf', 'ExtraTree', 'AdaBoost', 'SVR']
-base_model_list = [clf_line, clf_ridg, clf_laso, clf_lala, clf_enet, clf_xgbr, clf_xgrf, clf_tree, clf_ada, clf_svr]
+# new 5
+base_model_name = ['Ridge', 'SVR', 'XgbReg', 'ExtraTree', 'AdaBoost']
+base_model_list = [clf_ridg, clf_svr, clf_xgbr, clf_tree, clf_ada]
+
+
+# base_model_name = ['LinearReg', 'Ridge', 'Lasso', 'LassoLars', 'ElasticNet', 'XgbReg', 'XgbRf', 'ExtraTree', 'AdaBoost', 'SVR']
+# base_model_list = [clf_line, clf_ridg, clf_laso, clf_lala, clf_enet, clf_xgbr, clf_xgrf, clf_tree, clf_ada, clf_svr]
 
 # base_model_name = ['LinearReg', 'Ridge', 'Lasso', 'LassoLars', 'ElasticNet', 'Xgb', 'RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
 # base_model_list = [clf_line, clf_ridg, clf_laso, clf_lala, clf_enet, clf_bxgb, clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
