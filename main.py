@@ -51,13 +51,13 @@ test_file_names = [f for f in listdir(test_file_path) if isfile(join(test_file_p
 submission_data_path = './data/sample_submission.csv'
 
 feature_file_path_train = './data/features-'+str(n_data)+'.csv'
-feature_file_path_test = './data/features-test.csv'
+feature_file_path_test = './data/features-test-withId.csv'
 
 plot_feature_imp_file_path = './plot/featImp-'
 plot_model_corr_test_file_path = './plot/modelCorr-test.png'
 plot_model_corr_train_file_path = './plot/modelCorr-train.png'
 
-plot_feature_importance = True
+plot_feature_importance = False
 plot_model_correlation = False
 read_feature_from_file = True
 
@@ -80,7 +80,7 @@ if(read_feature_from_file):
 
     logging.info('Reading testing feature data: %s.' % feature_file_path_test)
     test_x = pd.read_csv(feature_file_path_test, sep='\t')
-    test_x.drop(['Unnamed: 0'], axis=1, inplace=True) # drop 'Unnamed index'
+    # test_x.drop(['Unnamed: 0'], axis=1, inplace=True) # drop 'Unnamed index'
     # TODO - feature filtering
     print(test_x.shape)
 
@@ -181,17 +181,19 @@ test_x[test_column_name_list] = feature_scaler.transform(test_x[test_column_name
 # Initialize models
 
 clf_line = LinearRegression()
-clf_ridg = Ridge()
-clf_laso = Lasso()
-clf_lala = LassoLars()
-clf_enet = ElasticNet()
-clf_bxgb = xgb.XGBRegressor()
+# clf_ridg = Ridge(alpha=300, tol=1e-05, solver='sparse_cg', max_iter=5000)
+# clf_laso = Lasso(alpha=0.1, tol=1e-05, max_iter=5000)
+# clf_lala = LassoLars(alpha=0.001, max_iter=5000)
+# clf_enet = ElasticNet(alpha=0.1, tol=0.001, l1_ratio=0.2, max_iter=5000)
 
-clf_rf = RandomForestRegressor()
-clf_tree = ExtraTreesRegressor()
-clf_ada = AdaBoostRegressor()
-clf_grad = GradientBoostingRegressor()
-clf_svr = SVR()
+clf_xgbr = xgb.XGBRegressor() # not yet
+clf_xgrf = xgb.XGBRFRegressor() # not yet
+
+clf_rf = RandomForestRegressor(criterion='mae', max_features='sqrt', n_estimators=200, max_depth=10)
+clf_tree = ExtraTreesRegressor(criterion='mae', max_features='sqrt', n_estimators=200, max_depth=10)
+clf_ada = AdaBoostRegressor(n_estimators=3, loss='linear')
+clf_grad = GradientBoostingRegressor() # not yet
+clf_svr = SVR(kernel='rbf', C=0.1)
 
 base_model_name = ['RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
 base_model_list = [clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
@@ -202,11 +204,19 @@ base_model_list = [clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
 clf_xgb = xgb.XGBRegressor()
 
 m_stacking = ST.StackModel(baseModelList = base_model_list, clfModel = clf_xgb)
-predict_y = m_stacking.run(x_train = feature_df.drop(['time_to_failure'], axis=1), y_train = feature_df['time_to_failure'], x_test = feature_df.drop(['time_to_failure'], axis=1), get_feat_imp=plot_feature_importance ) # x_test = test_x.drop(['seg_id'], axis=1)
+predict_y = m_stacking.run(x_train = feature_df.drop(['time_to_failure'], axis=1), y_train = feature_df['time_to_failure'], x_test = test_x.drop(['seg_id'], axis=1), get_feat_imp=plot_feature_importance ) # x_test = test_x.drop(['seg_id'], axis=1)
 logging.info('Finish Training.')
 print(predict_y)
 print(predict_y.shape)
-print(mean_absolute_error(feature_df['time_to_failure'], predict_y)) # prediction mae
+# print(mean_absolute_error(feature_df['time_to_failure'], predict_y)) # prediction mae
+
+# Write prediction to csv
+result_df = pd.DataFrame(index=range(predict_y.shape[0]), dtype=np.float64)
+result_df['seg_id'] = test_x['seg_id']
+result_df['time_to_failure'] = predict_y
+submission_file_name = './data/output/stacking_model_original5.csv'
+print(result_df.shape)
+result_df.to_csv(submission_file_name, sep=',', encoding='utf-8', index=False)
 
 
 # Plot feature importance
@@ -267,5 +277,4 @@ if(plot_model_correlation):
     plt.savefig(plot_model_corr_train_file_path)
 
 
-# grid search - model arguments
 
