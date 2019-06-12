@@ -3,3 +3,5 @@ __pycache__/
 /no_use/*
 /presentation-1/*
 !/data/features*
+!/data/output/*
+!/data/output/
