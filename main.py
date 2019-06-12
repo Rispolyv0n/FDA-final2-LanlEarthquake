@@ -13,6 +13,7 @@ import datetime
 import logging
 import sys
 
+import func as FUNC
 import feature_extraction as FE
 from model import stacking as ST
 
@@ -60,6 +61,8 @@ plot_model_corr_train_file_path = './plot/modelCorr-train.png'
 plot_feature_importance = False
 plot_model_correlation = False
 read_feature_from_file = True
+remove_bad_feature = True
+
 
 
 # Read feature data or original data
@@ -157,6 +160,17 @@ else:
     logging.info('Checking features of testing data:')
     print(test_x.shape)
 
+
+
+# Remove bad features
+
+if(remove_bad_feature):
+    logging.info('Removing bad features...')
+    bad_feat_name_list = FUNC.get_bad_feature_name()
+    feature_df.drop(bad_feat_name_list, axis=1, inplace=True)
+    test_x.drop(bad_feat_name_list, axis=1, inplace=True)
+    print(feature_df.shape)
+    print(test_x.shape)
 
 
 # Feature scaling
