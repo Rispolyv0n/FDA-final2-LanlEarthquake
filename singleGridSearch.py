@@ -213,9 +213,10 @@ param_grad = {
     'max_features': [None, 'sqrt', 'log2']
 }
 
+# mae 2.142 {C 0.1 [0.1, 1, 10, 100, 0.001, 0.0001], kernel rbf ['rbf', 'linear', 'poly', 'sigmoid']}
 param_svr = {
-    'kernel': ['rbf', 'linear', 'poly', 'sigmoid'], #, 'precomputed'
-    'C': [0.1, 1, 10, 100]
+    'kernel': ['rbf', 'poly', 'sigmoid'], #, 'precomputed' # rbf
+    'C': [0.1, 0.001, 0.0001] # 0.1
 }
 
 
@@ -227,14 +228,14 @@ param_svr = {
 # grid_search_for_models(model=clf_lala, param=param_lala, name='LassoLars', data=feature_df) # done
 # grid_search_for_models(model=clf_enet, param=param_enet, name='ElasticNet', data=feature_df) # done
 
-# grid_search_for_models(model=clf_xgbr, param=param_xgbr, name='XGB Regression', data=feature_df) # not yet
-# grid_search_for_models(model=clf_xgrf, param=param_xgrf, name='XGB RF', data=feature_df) # not yet
+grid_search_for_models(model=clf_xgbr, param=param_xgbr, name='XGB Regression', data=feature_df) # not yet
+grid_search_for_models(model=clf_xgrf, param=param_xgrf, name='XGB RF', data=feature_df) # not yet
 
 # grid_search_for_models(model=clf_rf, param=param_rf, name='RandomForest', data=feature_df) # done
 # grid_search_for_models(model=clf_tree, param=param_tree, name='ExtraTrees', data=feature_df) # done
 # grid_search_for_models(model=clf_ada, param=param_ada, name='AdaBoost', data=feature_df) # done
-# grid_search_for_models(model=clf_grad, param=param_grad, name='GradientBoost', data=feature_df) # not yet
-grid_search_for_models(model=clf_svr, param=param_svr, name='SVR', data=feature_df) # running
+grid_search_for_models(model=clf_grad, param=param_grad, name='GradientBoost', data=feature_df) # not yet
+# grid_search_for_models(model=clf_svr, param=param_svr, name='SVR', data=feature_df) # done
 
 
 

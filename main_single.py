@@ -138,7 +138,6 @@ else:
     logging.info('Checking features of testing data:')
     print(test_x.shape)
 
-sys.exit(0)
 
 # Feature scaling
 
@@ -174,7 +173,7 @@ clf_rf = RandomForestRegressor(criterion='mae', max_features='sqrt', n_estimator
 clf_tree = ExtraTreesRegressor(criterion='mae', max_features='sqrt', n_estimators=200, max_depth=10)
 clf_ada = AdaBoostRegressor(n_estimators=3, loss='linear')
 clf_grad = GradientBoostingRegressor() # not yet
-clf_svr = SVR() # not yet
+clf_svr = SVR(kernel='rbf', C=0.1)
 
 base_model_name = ['LinearReg', 'Ridge', 'Lasso', 'LassoLars', 'ElasticNet', 'XgbReg', 'XgbRandomForest', 'RandomForest', 'ExtraTree', 'AdaBoost', 'GradientBoosting', 'SVR']
 base_model_list = [clf_line, clf_ridg, clf_laso, clf_lala, clf_enet, clf_xgbr, clf_xgrf, clf_rf, clf_tree, clf_ada, clf_grad, clf_svr]
