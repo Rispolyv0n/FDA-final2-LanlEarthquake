@@ -68,20 +68,22 @@ if(read_feature_from_file):
 
     logging.info('Reading testing feature data: %s.' % feature_file_path_test)
     test_x = pd.read_csv(feature_file_path_test, sep='\t')
-    test_x.drop(['Unnamed: 0'], axis=1, inplace=True) # drop 'Unnamed index'
+    # test_x.drop(['Unnamed: 0'], axis=1, inplace=True) # drop 'Unnamed index'
     # TODO - feature filtering
     print(test_x.shape)
 
 else:
     # Read data - training data
-
-    logging.info('Reading training data(incomplete).')
+    if(n_data >= 4190):
+        logging.info('Reading training data.')
+    else:
+        logging.info('Reading training data(incomplete).')
     train_df = pd.read_csv(train_data_path, nrows=read_data_row, skiprows=skip_data_row)
     print(train_df.shape)
 
     # Read data - testing data
 
-    logging.info('Reading testing data(incomplete).')
+    logging.info('Reading testing data.')
     test_df_list = []
     test_name_list = []
     for name in test_file_names:
@@ -93,7 +95,9 @@ else:
 
     # Read data - submission data
 
+    logging.info('Reading submission data.')
     submission_df = pd.read_csv(submission_data_path)
+    print(submission_df.shape)
 
 
     # Feature extraction - training data
@@ -193,8 +197,5 @@ for i, model in enumerate(base_model_list):
     result_df['time_to_failure'] = predict_test
     submission_file_name = './data/output/singleModel-' + base_model_name[i] + '.csv'
     print(result_df.shape)
-    print(result_df.head())
     result_df.to_csv(submission_file_name, sep=',', encoding='utf-8', index=False)
-    break
-    
 

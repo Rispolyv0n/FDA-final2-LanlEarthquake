@@ -77,7 +77,10 @@ if(read_feature_from_file):
 else:
     # Read data - training data
 
-    logging.info('Reading training data(incomplete).')
+    if(n_data >= 4190):
+        logging.info('Reading training data.')
+    else:
+        logging.info('Reading training data(incomplete).')
     train_df = pd.read_csv(train_data_path, nrows=read_data_row, skiprows=skip_data_row)
     print(train_df.shape)
 
