@@ -28,6 +28,7 @@ In `main.py` and `main_single.py`, there are some parameters:
 - `plot_model_correlation` : Set `True` then it will plot correlations between single models.
 - `read_feature_from_file` : Set `True` then it won't calculate the features from the original dataset, it only read `features-*.csv` from `/data` directory. If `False`, then original dataset is required. Original dataset should be put in the `/data` directory.
 - `remove_bad_feature` : Set `True` then it would drop features with low importance(not recommended).
+
 After setting the parameters above, you can run the scripts by following commands:
 - `python3 main.py` : run stacking model
 - `python3 main_single.py` : run single models
