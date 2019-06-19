@@ -31,4 +31,4 @@ In `main.py` and `main_single.py`, there are some parameters:
 
 After setting the parameters above, you can run the scripts by following commands:
 - `python3 main.py` : run stacking model
-- `python3 main_single.py` : run single models
+- `python3 main_single.py` : run 12 single models, it will output 12 csv files in the /data/output directory. The 12 output files are predictions of testing data by each model respectively.
