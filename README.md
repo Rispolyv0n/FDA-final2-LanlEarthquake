@@ -25,10 +25,10 @@ https://www.kaggle.com/c/LANL-Earthquake-Prediction/data
 ## Run
 In `main.py` and `main_single.py`, there are some parameters:
 - `plot_feature_importance` : Set to `True` then it will plot feature importance calculated by each single model.
-- `plot_model_correlation` : Set to `True` then it will plot correlations between single models.
+- `plot_model_correlation` : Set to `True` then it will plot correlations between single models, output images will be in `/plot` directory.
 - `read_feature_from_file` : Set to `True` then it won't have to calculate the features from the original dataset again, it only read the pre-calculated features from the file `features-*.csv` in `/data` directory. If `False`, then original dataset is required. Original dataset should be put in the `/data` directory.
 - `remove_bad_feature` : Set to `True` then it would drop features with low importance(not recommended).
 
 After setting the parameters above, you can run the scripts by following commands:
 - `python3 main.py` : run stacking model
-- `python3 main_single.py` : run 12 single models, it will output 12 csv files in the /data/output directory. The 12 output files are predictions of testing data by each model respectively.
+- `python3 main_single.py` : run 12 single models, it will output 12 csv files in the `/data/output` directory. The 12 output files are predictions of testing data by each model respectively.
